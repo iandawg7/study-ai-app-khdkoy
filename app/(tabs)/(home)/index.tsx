@@ -1,79 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { Stack, Link } from "expo-router";
-import { FlatList, Pressable, StyleSheet, View, Text, Alert, Platform } from "react-native";
+import { ScrollView, Pressable, StyleSheet, View, Text, Platform } from "react-native";
 import { IconSymbol } from "@/components/IconSymbol";
-import { GlassView } from "expo-glass-effect";
 import { useTheme } from "@react-navigation/native";
-
-const ICON_COLOR = "#007AFF";
+import { colors, commonStyles } from "@/styles/commonStyles";
 
 export default function HomeScreen() {
   const theme = useTheme();
-  const modalDemos = [
+  const [recentStudies] = useState([
     {
-      title: "Standard Modal",
-      description: "Full screen modal presentation",
-      route: "/modal",
-      color: "#007AFF",
+      id: '1',
+      title: 'Biology Chapter 5',
+      subject: 'Biology',
+      progress: 65,
+      lastAccessed: '2 hours ago',
     },
     {
-      title: "Form Sheet",
-      description: "Bottom sheet with detents and grabber",
-      route: "/formsheet",
-      color: "#34C759",
+      id: '2',
+      title: 'History Essay Notes',
+      subject: 'History',
+      progress: 40,
+      lastAccessed: '1 day ago',
     },
-    {
-      title: "Transparent Modal",
-      description: "Overlay without obscuring background",
-      route: "/transparent-modal",
-      color: "#FF9500",
-    }
-  ];
-
-  const renderModalDemo = ({ item }: { item: (typeof modalDemos)[0] }) => (
-    <GlassView style={[
-      styles.demoCard,
-      Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
-    ]} glassEffectStyle="regular">
-      <View style={[styles.demoIcon, { backgroundColor: item.color }]}>
-        <IconSymbol name="square.grid.3x3" color="white" size={24} />
-      </View>
-      <View style={styles.demoContent}>
-        <Text style={[styles.demoTitle, { color: theme.colors.text }]}>{item.title}</Text>
-        <Text style={[styles.demoDescription, { color: theme.dark ? '#98989D' : '#666' }]}>{item.description}</Text>
-      </View>
-      <Link href={item.route as any} asChild>
-        <Pressable>
-          <GlassView style={[
-            styles.tryButton,
-            Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)' }
-          ]} glassEffectStyle="clear">
-            <Text style={[styles.tryButtonText, { color: theme.colors.primary }]}>Try It</Text>
-          </GlassView>
-        </Pressable>
-      </Link>
-    </GlassView>
-  );
+  ]);
 
   const renderHeaderRight = () => (
-    <Pressable
-      onPress={() => Alert.alert("Not Implemented", "This feature is not implemented yet")}
-      style={styles.headerButtonContainer}
-    >
-      <IconSymbol name="plus" color={theme.colors.primary} />
-    </Pressable>
+    <Link href="/upload" asChild>
+      <Pressable style={styles.headerButton}>
+        <IconSymbol name="plus" color={theme.colors.primary} size={24} />
+      </Pressable>
+    </Link>
   );
 
   const renderHeaderLeft = () => (
-    <Pressable
-      onPress={() => Alert.alert("Not Implemented", "This feature is not implemented yet")}
-      style={styles.headerButtonContainer}
-    >
-      <IconSymbol
-        name="gear"
-        color={theme.colors.primary}
-      />
-    </Pressable>
+    <Link href="/(tabs)/profile" asChild>
+      <Pressable style={styles.headerButton}>
+        <IconSymbol name="gear" color={theme.colors.primary} size={24} />
+      </Pressable>
+    </Link>
   );
 
   return (
@@ -81,25 +45,131 @@ export default function HomeScreen() {
       {Platform.OS === 'ios' && (
         <Stack.Screen
           options={{
-            title: "Building the app...",
+            title: "StudyAI",
             headerRight: renderHeaderRight,
             headerLeft: renderHeaderLeft,
           }}
         />
       )}
-      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <FlatList
-          data={modalDemos}
-          renderItem={renderModalDemo}
-          keyExtractor={(item) => item.route}
-          contentContainerStyle={[
-            styles.listContainer,
-            Platform.OS !== 'ios' && styles.listContainerWithTabBar
-          ]}
-          contentInsetAdjustmentBehavior="automatic"
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+      <ScrollView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <Text style={[commonStyles.title, { color: theme.colors.text }]}>
+            Welcome Back! 👋
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.colors.text }]}>
+            Ready to study smarter?
+          </Text>
+        </View>
+
+        <View style={styles.quickActionsContainer}>
+          <Link href="/upload" asChild>
+            <Pressable
+              style={[
+                styles.actionCard,
+                { backgroundColor: colors.primary, borderColor: colors.primary }
+              ]}
+            >
+              <IconSymbol name="arrow.up.doc" color="white" size={28} />
+              <Text style={styles.actionCardText}>Upload Material</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/quiz" asChild>
+            <Pressable
+              style={[
+                styles.actionCard,
+                { backgroundColor: colors.secondary, borderColor: colors.secondary }
+              ]}
+            >
+              <IconSymbol name="questionmark.circle" color="white" size={28} />
+              <Text style={styles.actionCardText}>Take Quiz</Text>
+            </Pressable>
+          </Link>
+        </View>
+
+        <View style={styles.quickActionsContainer}>
+          <Link href="/flashcards" asChild>
+            <Pressable
+              style={[
+                styles.actionCard,
+                { backgroundColor: colors.accent, borderColor: colors.accent }
+              ]}
+            >
+              <IconSymbol name="square.grid.2x2" color="white" size={28} />
+              <Text style={styles.actionCardText}>Flashcards</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/progress" asChild>
+            <Pressable
+              style={[
+                styles.actionCard,
+                { backgroundColor: colors.highlight, borderColor: colors.highlight }
+              ]}
+            >
+              <IconSymbol name="chart.bar" color={colors.text} size={28} />
+              <Text style={[styles.actionCardText, { color: colors.text }]}>Progress</Text>
+            </Pressable>
+          </Link>
+        </View>
+
+        <View style={styles.sectionContainer}>
+          <Text style={[commonStyles.subtitle, { color: theme.colors.text }]}>
+            Recent Studies
+          </Text>
+          {recentStudies.map((study) => (
+            <Link key={study.id} href={`/study/${study.id}`} asChild>
+              <Pressable
+                style={[
+                  styles.studyCard,
+                  { backgroundColor: theme.colors.card, borderColor: theme.colors.border }
+                ]}
+              >
+                <View style={styles.studyCardContent}>
+                  <Text style={[styles.studyTitle, { color: theme.colors.text }]}>
+                    {study.title}
+                  </Text>
+                  <Text style={[styles.studySubject, { color: theme.colors.text }]}>
+                    {study.subject}
+                  </Text>
+                  <View style={styles.progressBar}>
+                    <View
+                      style={[
+                        styles.progressFill,
+                        { width: `${study.progress}%`, backgroundColor: colors.primary }
+                      ]}
+                    />
+                  </View>
+                  <Text style={[styles.studyMeta, { color: colors.textSecondary }]}>
+                    {study.progress}% complete • {study.lastAccessed}
+                  </Text>
+                </View>
+                <IconSymbol name="chevron.right" color={colors.textSecondary} size={20} />
+              </Pressable>
+            </Link>
+          ))}
+        </View>
+
+        <View style={styles.premiumBanner}>
+          <View style={styles.premiumContent}>
+            <Text style={[styles.premiumTitle, { color: colors.card }]}>
+              Unlock Premium 🚀
+            </Text>
+            <Text style={[styles.premiumDescription, { color: colors.card }]}>
+              Get unlimited uploads, advanced quizzes & personalized insights
+            </Text>
+          </View>
+          <Link href="/subscription" asChild>
+            <Pressable style={styles.premiumButton}>
+              <Text style={styles.premiumButtonText}>Learn More</Text>
+            </Pressable>
+          </Link>
+        </View>
+      </ScrollView>
     </>
   );
 }
@@ -107,55 +177,127 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor handled dynamically
   },
-  listContainer: {
-    paddingVertical: 16,
+  contentContainer: {
+    paddingBottom: Platform.OS !== 'ios' ? 120 : 20,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 24,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.textSecondary,
+  },
+  quickActionsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    gap: 12,
+  },
+  actionCard: {
+    flex: 1,
+    paddingVertical: 20,
     paddingHorizontal: 16,
-  },
-  listContainerWithTabBar: {
-    paddingBottom: 100, // Extra padding for floating tab bar
-  },
-  demoCard: {
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
+    elevation: 3,
+  },
+  actionCardText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'white',
+    textAlign: 'center',
+  },
+  sectionContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  studyCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.08)',
+    elevation: 2,
   },
-  demoIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  demoContent: {
+  studyCardContent: {
     flex: 1,
   },
-  demoTitle: {
-    fontSize: 18,
+  studyTitle: {
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
-    // color handled dynamically
   },
-  demoDescription: {
-    fontSize: 14,
-    lineHeight: 18,
-    // color handled dynamically
+  studySubject: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 8,
+    color: colors.textSecondary,
   },
-  headerButtonContainer: {
-    padding: 6,
+  progressBar: {
+    height: 6,
+    backgroundColor: colors.border,
+    borderRadius: 3,
+    marginBottom: 8,
+    overflow: 'hidden',
   },
-  tryButton: {
+  progressFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  studyMeta: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  headerButton: {
+    padding: 8,
+    marginHorizontal: 8,
+  },
+  premiumBanner: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 20,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    boxShadow: '0px 4px 12px rgba(63, 81, 181, 0.3)',
+    elevation: 4,
   },
-  tryButtonText: {
-    fontSize: 14,
+  premiumContent: {
+    flex: 1,
+  },
+  premiumTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  premiumDescription: {
+    fontSize: 13,
+    fontWeight: '400',
+    lineHeight: 18,
+  },
+  premiumButton: {
+    backgroundColor: colors.card,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginLeft: 12,
+  },
+  premiumButtonText: {
+    fontSize: 13,
     fontWeight: '600',
-    // color handled dynamically
+    color: colors.primary,
   },
 });
